@@ -21,7 +21,6 @@
 * JavaScript, jQuery, Any UI Technology you want to use
 * CSS(3)
 * HTML (if required)
-* Typescript(bonus) 
 
 * ***1. The Backend***
   * Using a Four Square library, hard code into the script a location/s.
