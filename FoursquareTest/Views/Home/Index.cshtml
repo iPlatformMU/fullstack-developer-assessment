@@ -1,0 +1,159 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="container p-3">
+
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Place List</h2>
+        </div>
+    </div>
+
+
+    <div class="form-group row">
+        <label for="Places" class="col-sm-2 col-form-label">Choose Place</label>
+        <div class="col-sm-4">
+            @Html.DropDownList("ddlPlaces", (IEnumerable<SelectListItem>)ViewData["Places"], new {@class="form-select"})
+        </div>
+        <div class="col-6 text-end">
+            <a asp-controller="Place" asp-action="Index" class="btn btn-primary">
+                <i class="bi bi-search"></i> &nbsp; View Places
+            </a>
+        </div>
+    </div>
+
+    <br />
+
+    <div id="results"></div>
+
+    <br />
+
+    <table class="table table-bordered table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>
+                   Place 
+                </th>
+                <th>
+                   Name
+                </th>
+                <th>
+                   Latitude
+                </th>
+                <th>
+                   Longitude
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="tblPlaces" >
+           
+        </tbody>
+
+    </table>
+
+    <br />
+    <br />
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script>
+
+    debugger;
+function GetPhotos(latitude,longitude){
+
+    $.ajax({
+    url: "Home/GetFlickrImages?latitude=" + latitude + "&longitude=" + longitude,
+    dataType: 'json',
+    error: function () {
+       console.log('JSON FAILED for data');
+    },
+    success: function (results) {
+
+       console.log(results);
+       var photos = document.getElementById("results");
+       photos.innerHTML = "";
+
+       results.forEach(function (element) {
+           var img = document.createElement("img");
+           img.src = element.imageUri;
+           photos.appendChild(img);
+       });
+
+       }
+   });
+};
+
+$(document).ready(function(){
+    
+    $("#ddlPlaces").change(function(){
+
+        var e = document.getElementById("ddlPlaces");
+        var place = e.options[e.selectedIndex].text;
+
+        var params = "place="+place;
+
+        $.ajax({
+         url: "Home/GetPlacesFromFoursquare?" + params,
+         dataType: 'json',
+         error: function () {
+            console.log('JSON FAILED for data');
+         },
+         success: function (results) {
+
+            console.log(results);
+            var places = document.getElementById("tblPlaces");
+            results.forEach(function (element) {
+
+               places.insertAdjacentHTML('beforeend', "<tr>" +
+                                         "<td>" + place + "</td>" +
+                                         "<td>" + element.name + "</td>" +
+                                         "<td>" + element.geocodes.main.latitude + "</td>" +
+                                         "<td>" + element.geocodes.main.longitude + "</td>" +
+                                         "<td><button type=\"button\" class=\"btn btn-success\" onclick=GetPhotos(\"" + element.geocodes.main.latitude + "\",\"" + element.geocodes.main.longitude + "\")>Get Photos</button></td>" +
+                                         "</tr>");
+            });
+         }
+      });
+      });
+     
+      
+
+    //   $('#button').click(function(){
+    //     const request  = new XMLHttpRequest();
+    //    request.open("GET", "Home/GetFlickrImages?latitude=1&longitude=2");
+    //    request.send();
+    //    request.onload=()=>{
+    //        if(request.status ===200)
+    //        {
+    //            console.log(request.response);
+    //        }else{
+
+    //        }
+    //    };
+    //});
+       
+
+    //$("#ddlPlaces").change(function(){
+    //    var params = "place="+$("#ddlPlaces Option:Selected").text();
+    //    const request  = new XMLHttpRequest();
+    //    request.open("GET", "Home/GetPlacesFromFoursquare?"+params);
+    //    request.send();
+    //    request.onload=()=>{
+    //        if(request.status ===200)
+    //        {
+    //            console.log(request.response);
+    //            var places = document.getElementById("tblPlaces");
+    //            request.response.forEach(function(element) {
+                    
+    //            places.insertAdjacentHTML( 'beforeend',"<tr> <td>" +              
+    //                                               element.name + "</td> </tr>");
+    //            });
+    //        }else{
+
+    //        }
+    //    };
+    //});
+});
+</script>
